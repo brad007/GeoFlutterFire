@@ -23,10 +23,10 @@ class GeoFireCollectionRef {
   /// return the Document mapped to the [id]
   Stream<List<DocumentSnapshot>> data(String id) {
     return _stream.map((QuerySnapshot querySnapshot) {
-      querySnapshot.docs.where((DocumentSnapshot documentSnapshot) {
-        return documentSnapshot.id == id;
+      querySnapshot.documents.where((DocumentSnapshot documentSnapshot) {
+        return documentSnapshot.documentID == id;
       });
-      return querySnapshot.docs;
+      return querySnapshot.documents;
     });
   }
 
@@ -45,7 +45,7 @@ class GeoFireCollectionRef {
   Future<void> delete(id) {
     try {
       CollectionReference colRef = _collectionReference;
-      return colRef.doc(id).delete();
+      return colRef.document(id).delete();
     } catch (e) {
       throw Exception(
           'cannot call delete on Query, use collection reference instead');
@@ -56,7 +56,7 @@ class GeoFireCollectionRef {
   Future<void> setDoc(String id, var data, {bool merge = false}) {
     try {
       CollectionReference colRef = _collectionReference;
-      return colRef.doc(id).set(data, SetOptions(merge: merge));
+      return colRef.document(id).setData(data, merge: merge);
     } catch (e) {
       throw Exception(
           'cannot call set on Query, use collection reference instead');
@@ -69,7 +69,7 @@ class GeoFireCollectionRef {
     try {
       CollectionReference colRef = _collectionReference;
       var point = GeoFirePoint(latitude, longitude).data;
-      return colRef.doc(id).set({'$field': point}, SetOptions(merge: true));
+      return colRef.document(id).setData({'$field': point}, merge: true);
     } catch (e) {
       throw Exception(
           'cannot call set on Query, use collection reference instead');
@@ -91,7 +91,7 @@ class GeoFireCollectionRef {
     Iterable<Stream<List<DistanceDocSnapshot>>> queries = area.map((hash) {
       Query tempQuery = _queryPoint(hash, field);
       return _createStream(tempQuery).map((QuerySnapshot querySnapshot) {
-        return querySnapshot.docs
+        return querySnapshot.documents
             .map((element) => DistanceDocSnapshot(element, null))
             .toList();
       });
@@ -105,7 +105,7 @@ class GeoFireCollectionRef {
         // split and fetch geoPoint from the nested Map
         List<String> fieldList = field.split('.');
         var geoPointField =
-            distanceDocSnapshot.documentSnapshot.data()[fieldList[0]];
+            distanceDocSnapshot.documentSnapshot.data[fieldList[0]];
         if (fieldList.length > 1) {
           for (int i = 1; i < fieldList.length; i++) {
             geoPointField = geoPointField[fieldList[i]];
