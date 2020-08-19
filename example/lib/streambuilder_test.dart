@@ -10,7 +10,7 @@ class StreamTestWidget extends StatefulWidget {
 
 class _StreamTestWidgetState extends State<StreamTestWidget> {
   Stream<List<DocumentSnapshot>> stream;
-  Firestore _firestore = Firestore.instance;
+  FirebaseFirestore _firestore = FirebaseFirestore.instance;
   Geoflutterfire geo;
 
   // ignore: close_sinks
@@ -47,16 +47,16 @@ class _StreamTestWidgetState extends State<StreamTestWidget> {
                     itemBuilder: (context, index) {
                       DocumentSnapshot doc = snapshots.data[index];
                       print(
-                          'doc with id ${doc.documentID} distance ${doc.data['distance']}');
-                      GeoPoint point = doc.data['position']['geopoint'];
+                          'doc with id ${doc.id} distance ${doc.data()['distance']}');
+                      GeoPoint point = doc.data()['position']['geopoint'];
                       return ListTile(
                         title: Text(
-                          '${doc.documentID}',
+                          '${doc.id}',
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         subtitle: Text('${point.latitude}, ${point.longitude}'),
                         trailing: Text(
-                            '${doc.data['documentType'] == DocumentChangeType.added ? 'Added' : 'Modified'}'),
+                            '${doc.data()['documentType'] == DocumentChangeType.added ? 'Added' : 'Modified'}'),
                       );
                     },
                     itemCount: snapshots.data.length,
